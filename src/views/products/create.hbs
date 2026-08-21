@@ -1,0 +1,87 @@
+<div class="product-form-page">
+    <div class="container">
+        <div class="product-form-card" data-aos="fade-up">
+            <h2 class="h2 mb-4">Đăng sản phẩm mới</h2>
+
+            <form method="POST" action="/products/store" enctype="multipart/form-data" id="productForm">
+                <div class="field-group">
+                    <label class="field-label">Tên sản phẩm</label>
+                    <input type="text" class="field-input" name="name" placeholder="VD: Áo thun nam basic" required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Mô tả</label>
+                    <textarea class="field-textarea" name="description" rows="4" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Giá gốc (₫)</label>
+                        <input type="text" inputmode="numeric" class="field-input price-format-input" name="price" placeholder="VD: 1.000.000" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Giá khuyến mãi (₫)</label>
+                        <input type="text" inputmode="numeric" class="field-input price-format-input" name="salePrice" placeholder="Để trống nếu không giảm">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Danh mục</label>
+                        <select class="field-select" name="category">
+                            <option value="">-- Chọn danh mục --</option>
+                            {{#each categories}}
+                            <option value="{{this.key}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Tồn kho</label>
+                        <input type="number" class="field-input" name="stock" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Hình ảnh sản phẩm (tối đa 5 ảnh)</label>
+                    <input type="file" class="field-input" name="images" id="imagesInput" multiple accept="image/*">
+                    <div class="image-preview-row" id="imagePreview"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Đăng sản phẩm</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const imagesInput = document.getElementById('imagesInput');
+    const imagePreview = document.getElementById('imagePreview');
+    if (imagesInput) {
+        imagesInput.addEventListener('change', () => {
+            imagePreview.innerHTML = '';
+            Array.from(imagesInput.files).slice(0, 5).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview-thumb';
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+
+    document.querySelectorAll('.price-format-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const raw = input.value.replace(/\D/g, '');
+            input.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+        });
+    });
+
+    document.getElementById('productForm')?.addEventListener('submit', () => {
+        document.querySelectorAll('.price-format-input').forEach(input => {
+            input.value = input.value.replace(/\D/g, '');
+        });
+    });
+</script>

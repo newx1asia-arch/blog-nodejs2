@@ -1,0 +1,83 @@
+<div class="main">
+    <div class="container">
+        <div class="search-layout">
+            <aside class="filter-sidebar">
+                <form method="GET" action="/search">
+                    {{#if keyword}}<input type="hidden" name="q" value="{{keyword}}">{{/if}}
+
+                    <div class="filter-group">
+                        <p class="filter-title">Danh mục</p>
+                        <label class="filter-radio">
+                            <input type="radio" name="category" value="" {{#unless category}}checked{{/unless}}>
+                            Tất cả
+                        </label>
+                        {{#each categories}}
+                        <label class="filter-radio">
+                            <input type="radio" name="category" value="{{this.key}}" {{#eq ../category this.key}}checked{{/eq}}>
+                            {{this.name}}
+                        </label>
+                        {{/each}}
+                    </div>
+
+                    <div class="filter-group">
+                        <p class="filter-title">Khoảng giá</p>
+                        <div class="filter-price-row">
+                            <input type="number" name="minPrice" placeholder="₫ Từ" value="{{minPrice}}" min="0">
+                            <span>-</span>
+                            <input type="number" name="maxPrice" placeholder="₫ Đến" value="{{maxPrice}}" min="0">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Áp dụng</button>
+                </form>
+            </aside>
+
+            <div class="search-results">
+                <div class="search-toolbar">
+                    <p class="search-count">
+                        {{#if keyword}}Kết quả cho "<strong>{{keyword}}</strong>" — {{/if}}{{total}} sản phẩm
+                    </p>
+
+                    <form method="GET" action="/search" class="sort-form">
+                        {{#if keyword}}<input type="hidden" name="q" value="{{keyword}}">{{/if}}
+                        {{#if category}}<input type="hidden" name="category" value="{{category}}">{{/if}}
+                        {{#if minPrice}}<input type="hidden" name="minPrice" value="{{minPrice}}">{{/if}}
+                        {{#if maxPrice}}<input type="hidden" name="maxPrice" value="{{maxPrice}}">{{/if}}
+                        <label>Sắp xếp:</label>
+                        <select name="sort" onchange="this.form.submit()">
+                            <option value="newest" {{#eq sort "newest"}}selected{{/eq}}>Mới nhất</option>
+                            <option value="best-selling" {{#eq sort "best-selling"}}selected{{/eq}}>Bán chạy</option>
+                            <option value="rating" {{#eq sort "rating"}}selected{{/eq}}>Đánh giá cao</option>
+                            <option value="price-asc" {{#eq sort "price-asc"}}selected{{/eq}}>Giá thấp đến cao</option>
+                            <option value="price-desc" {{#eq sort "price-desc"}}selected{{/eq}}>Giá cao đến thấp</option>
+                        </select>
+                    </form>
+                </div>
+
+                {{#if products.length}}
+                <div class="product-grid">
+                    {{#each products}}
+                        {{> product-card}}
+                    {{/each}}
+                </div>
+
+                {{#if totalPages}}
+                <div class="pagination-bar">
+                    <a class="page-btn {{#unless hasPrev}}disabled{{/unless}}"
+                       href="/search?{{queryString}}&page={{prevPage}}">‹</a>
+                    {{#each pages}}
+                    <a class="page-btn {{#eq this ../currentPage}}active{{/eq}}"
+                       href="/search?{{../queryString}}&page={{this}}">{{this}}</a>
+                    {{/each}}
+                    <a class="page-btn {{#unless hasNext}}disabled{{/unless}}"
+                       href="/search?{{queryString}}&page={{nextPage}}">›</a>
+                </div>
+                {{/if}}
+
+                {{else}}
+                <div class="alert alert-warning mt-3">Không tìm thấy sản phẩm nào phù hợp.</div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

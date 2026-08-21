@@ -1,0 +1,153 @@
+<div class="hero-simple">
+    <div class="container">
+        <div class="hero-simple-text" data-aos="fade-up">
+            <h1 class="h1">Mua sắm <b>thông minh</b>.</h1>
+            <p class="h3">Sản phẩm chất lượng, giá tốt mỗi ngày</p>
+            <div class="btn-group">
+                <a href="/search" class="btn btn-primary">Xem sản phẩm</a>
+                <a href="/about" class="btn btn-secondary">Về chúng tôi</a>
+            </div>
+        </div>
+
+        <div id="bannerCarousel" class="carousel slide banner-carousel" data-bs-ride="carousel" data-aos="fade-up">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="2"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/img/hero.png" alt="Khuyến mãi 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="/img/pattern.png" alt="Khuyến mãi 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="/img/hero.png" alt="Khuyến mãi 3">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="main">
+    <div class="container main-container-full">
+
+        <div class="category-grid-section" data-aos="fade-up">
+            <div class="category-icon-grid">
+                {{#each categories}}
+                <a href="/search?category={{this.key}}" class="category-icon-item">
+                    <span class="category-icon-circle"><ion-icon name="{{this.icon}}"></ion-icon></span>
+                    <span class="category-icon-label">{{this.name}}</span>
+                </a>
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="quick-links" data-aos="fade-up">
+            <a href="/contact" class="quick-link-btn">
+                <ion-icon name="call-outline"></ion-icon> Liên hệ
+            </a>
+            <a href="/contact" class="quick-link-btn">
+                <ion-icon name="headset-outline"></ion-icon> Hỗ trợ
+            </a>
+        </div>
+
+        {{#if flashSaleProducts.length}}
+        <div class="flash-sale-section" data-aos="fade-up">
+            <div class="flash-sale-header">
+                <div class="flash-sale-title">
+                    <ion-icon name="flash"></ion-icon>
+                    Flash Sale
+                </div>
+                <div class="countdown-badge">
+                    Kết thúc trong
+                    <span class="countdown-time" id="flashSaleCountdown">--:--:--</span>
+                </div>
+            </div>
+            <div class="flash-sale-body">
+                <div class="flash-sale-row">
+                    {{#each flashSaleProducts}}
+                        {{> product-card}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        <div class="blog">
+            <div class="section-header-row" data-aos="fade-up">
+                <h2 class="h2 section-title mb-0">Gợi ý hôm nay</h2>
+                <a href="/search" class="view-all-link">
+                    Xem tất cả
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                </a>
+            </div>
+
+            <div class="product-grid">
+                {{#each suggestedProducts}}
+                    {{> product-card}}
+                {{else}}
+                <div class="alert alert-info w-100 text-center">
+                    Hiện chưa có sản phẩm nào. <a href="/products/create">Đăng sản phẩm đầu tiên ngay!</a>
+                </div>
+                {{/each}}
+            </div>
+
+            {{#if suggestedProducts.length}}
+            <div class="load-more-wrapper" data-aos="fade-up">
+                <a href="/search" class="btn load-more">Xem thêm sản phẩm</a>
+            </div>
+            {{/if}}
+        </div>
+
+        {{#each categorySections}}
+        {{#if this.products.length}}
+        <div class="category-section" data-aos="fade-up">
+            <div class="section-header-row">
+                <h2 class="h2 section-title mb-0">{{this.name}}</h2>
+                <a href="/search?category={{this.key}}" class="view-all-link">
+                    Xem tất cả
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                </a>
+            </div>
+            <div class="product-grid">
+                {{#each this.products}}
+                    {{> product-card}}
+                {{/each}}
+            </div>
+            <div class="load-more-wrapper" data-aos="fade-up">
+                <a href="/search?category={{this.key}}" class="btn load-more">Xem thêm {{this.name}}</a>
+            </div>
+        </div>
+        {{/if}}
+        {{/each}}
+
+    </div>
+</div>
+
+<script>
+    (function () {
+        const el = document.getElementById('flashSaleCountdown');
+        if (!el) return;
+
+        function updateCountdown() {
+            const now = new Date();
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            const diff = Math.max(0, endOfDay - now);
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            el.textContent = `${h}:${m}:${s}`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    })();
+</script>

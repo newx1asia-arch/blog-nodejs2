@@ -1,0 +1,51 @@
+<div class="account-page">
+    <div class="container">
+        <div class="account-grid">
+            {{> account-sidebar active="orders"}}
+
+            <div class="account-content">
+                <div class="dashboard-header">
+                    <h3 class="h3 mb-0">Đơn hàng của tôi</h3>
+                </div>
+
+                {{#if orders.length}}
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Ngày đặt</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each orders}}
+                        <tr>
+                            <td data-label="Mã đơn">#{{this._id}}</td>
+                            <td data-label="Ngày đặt">{{dateFormat this.createdAt}}</td>
+                            <td data-label="Tổng tiền">{{formatPrice this.total}}₫</td>
+                            <td data-label="Trạng thái"><span class="status-pill {{statusClass this.status}}">{{this.status}}</span></td>
+                            <td data-label=""><a href="/orders/{{this._id}}" class="action-btn view">Xem</a></td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                {{#if totalPages}}
+                <div class="pagination-bar" style="padding: 20px 0;">
+                    <a class="page-btn {{#unless hasPrev}}disabled{{/unless}}" href="?page={{prevPage}}">‹</a>
+                    {{#each pages}}
+                    <a class="page-btn {{#eq this ../currentPage}}active{{/eq}}" href="?page={{this}}">{{this}}</a>
+                    {{/each}}
+                    <a class="page-btn {{#unless hasNext}}disabled{{/unless}}" href="?page={{nextPage}}">›</a>
+                </div>
+                {{/if}}
+
+                {{else}}
+                <div class="dashboard-empty">Bạn chưa có đơn hàng nào.</div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

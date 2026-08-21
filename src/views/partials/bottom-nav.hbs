@@ -1,0 +1,32 @@
+<nav class="bottom-nav">
+    <a href="/" class="bottom-nav-item" data-path="/">
+        <ion-icon name="home-outline"></ion-icon>
+        <span>Trang chủ</span>
+    </a>
+    <a href="/search" class="bottom-nav-item" data-path="/search">
+        <ion-icon name="search-outline"></ion-icon>
+        <span>Danh mục</span>
+    </a>
+    <a href="/cart" class="bottom-nav-item" data-path="/cart">
+        <span class="bottom-nav-cart-icon">
+            <ion-icon name="cart-outline"></ion-icon>
+            {{#if cartCount}}<span class="cart-badge">{{cartCount}}</span>{{/if}}
+        </span>
+        <span>Giỏ hàng</span>
+    </a>
+    <a href="/wishlist" class="bottom-nav-item" data-path="/wishlist">
+        <ion-icon name="heart-outline"></ion-icon>
+        <span>Yêu thích</span>
+    </a>
+    {{#if currentUser}}
+    <a href="/me/profile" class="bottom-nav-item" data-path="/me">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Tài khoản</span>
+    </a>
+    {{else}}
+    <a href="/auth/login" class="bottom-nav-item" data-path="/auth">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Đăng nhập</span>
+    </a>
+    {{/if}}
+</nav>

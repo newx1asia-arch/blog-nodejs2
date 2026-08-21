@@ -1,0 +1,27 @@
+<div class="main">
+    <div class="container">
+        <h2 class="h2 mb-2">Liên hệ</h2>
+        <p class="blog-text mb-4" style="display:block; color: var(--foreground-secondary);">
+            Có thắc mắc về sản phẩm hoặc đơn hàng? Để lại thông tin bên dưới, chúng tôi sẽ phản hồi sớm nhất.
+        </p>
+
+        {{#if success}}<div class="field-success">{{success}}</div>{{/if}}
+        {{#if error}}<div class="field-error">{{error}}</div>{{/if}}
+
+        <form action="/contact" method="POST" class="checkout-form-card" style="max-width: 500px;">
+            <div class="field-group">
+                <label class="field-label">Họ tên</label>
+                <input type="text" class="field-input" name="fullname" required>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Email</label>
+                <input type="email" class="field-input" name="email" required>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Nội dung</label>
+                <textarea class="field-textarea" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Gửi liên hệ</button>
+        </form>
+    </div>
+</div>

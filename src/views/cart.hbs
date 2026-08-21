@@ -1,0 +1,58 @@
+<div class="cart-page">
+    <div class="container">
+        <h2 class="h2 mb-4">Giỏ hàng của bạn</h2>
+
+        {{#if items.length}}
+
+        {{#if hasOverStock}}
+        <div class="field-error">
+            Một số sản phẩm trong giỏ vượt quá số lượng tồn kho hiện có, vui lòng điều chỉnh số lượng trước khi thanh toán.
+        </div>
+        {{/if}}
+
+        <div class="cart-list">
+            {{#each items}}
+            <div class="cart-item">
+                <div class="cart-item-img">
+                    <img src="{{#if this.product.img}}{{this.product.img}}{{else}}/img/pattern.png{{/if}}"
+                         alt="{{this.product.name}}" onerror="this.onerror=null;this.src='/img/pattern.png';">
+                </div>
+                <div class="cart-item-info">
+                    <a href="/products/{{this.product.slug}}" class="cart-item-name">{{this.product.name}}</a>
+                    <span class="cart-item-price">
+                        Đơn giá: {{#if this.product.salePrice}}{{formatPrice this.product.salePrice}}{{else}}{{formatPrice this.product.price}}{{/if}}₫
+                    </span>
+                    {{#if this.overStock}}
+                    <span class="overstock-warning">Chỉ còn {{this.product.stock}} sản phẩm trong kho</span>
+                    {{/if}}
+                    <div class="cart-item-row2">
+                        <form method="POST" action="/cart/update/{{this._id}}?_method=PUT" class="qty-form">
+                            <input type="number" name="quantity" value="{{this.quantity}}" min="1" max="{{this.product.stock}}">
+                            <button type="submit">Cập nhật</button>
+                        </form>
+                        <span class="cart-item-subtotal">{{formatPrice this.subtotal}}₫</span>
+                        <form method="POST" action="/cart/remove/{{this._id}}?_method=DELETE" class="remove-form">
+                            <button type="submit">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="cart-summary-bar">
+            <h4>Tổng cộng: <span class="cart-item-subtotal">{{formatPrice total}}₫</span></h4>
+            {{#if hasOverStock}}
+            <button class="btn btn-secondary" disabled title="Vui lòng điều chỉnh số lượng vượt tồn kho">Tiến hành thanh toán</button>
+            {{else}}
+            <a href="/checkout" class="btn btn-primary">Tiến hành thanh toán</a>
+            {{/if}}
+        </div>
+        {{else}}
+        <div class="cart-empty">
+            <p>Giỏ hàng của bạn đang trống.</p>
+            <a href="/" class="btn btn-primary">Tiếp tục mua sắm</a>
+        </div>
+        {{/if}}
+    </div>
+</div>

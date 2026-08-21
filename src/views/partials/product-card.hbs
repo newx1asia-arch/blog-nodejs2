@@ -1,0 +1,38 @@
+<div class="product-card" data-aos="fade-up" data-aos-delay="{{multiply @index 40}}">
+    <a href="/products/{{#if this.slug}}{{this.slug}}{{else}}#{{/if}}" class="product-card-link">
+        <div class="product-card-image">
+            <img src="{{#if this.img}}{{this.img}}{{else}}/img/pattern.png{{/if}}"
+                 alt="{{this.name}}"
+                 onerror="this.onerror=null; this.src='/img/pattern.png';">
+            {{#if this.salePrice}}
+            <span class="sale-badge">-{{discountPercent this.price this.salePrice}}%</span>
+            {{/if}}
+        </div>
+        <div class="product-card-body">
+            <p class="product-card-name">{{#if this.name}}{{this.name}}{{else}}Chưa có tên{{/if}}</p>
+            <div class="price-row">
+                {{#if this.salePrice}}
+                    <span class="price-sale">{{formatPrice this.salePrice}}₫</span>
+                    <span class="price-old">{{formatPrice this.price}}₫</span>
+                {{else}}
+                    <span class="price-sale">{{formatPrice this.price}}₫</span>
+                {{/if}}
+            </div>
+            <div class="product-card-meta">
+                <ion-icon name="star"></ion-icon>
+                <span>{{#if this.ratingAvg}}{{this.ratingAvg}}{{else}}Mới{{/if}}</span>
+                <span>·</span>
+                <span>Đã bán {{#if this.sold}}{{this.sold}}{{else}}0{{/if}}</span>
+            </div>
+        </div>
+    </a>
+
+    {{#if @root.currentUser}}
+    <form method="POST" action="/wishlist/toggle/{{this._id}}" class="wishlist-form">
+        <button type="submit" class="wishlist-btn {{#if (inArray @root.wishlistIds this._id)}}active{{/if}}"
+                title="Thêm vào yêu thích">
+            <ion-icon name="{{#if (inArray @root.wishlistIds this._id)}}heart{{else}}heart-outline{{/if}}"></ion-icon>
+        </button>
+    </form>
+    {{/if}}
+</div>

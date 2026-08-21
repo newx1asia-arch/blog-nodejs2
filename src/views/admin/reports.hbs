@@ -1,0 +1,61 @@
+<div class="dashboard-page">
+    <div class="container">
+        <div class="dashboard-header">
+            <h2 class="h2 mb-0">Quản lý tố cáo</h2>
+        </div>
+
+        <div class="admin-status-tabs">
+            <a href="/admin/reports?status=pending" class="admin-tab {{#eq status "pending"}}active{{/eq}}">Chờ xử lý</a>
+            <a href="/admin/reports?status=resolved" class="admin-tab {{#eq status "resolved"}}active{{/eq}}">Đã gỡ</a>
+            <a href="/admin/reports?status=dismissed" class="admin-tab {{#eq status "dismissed"}}active{{/eq}}">Đã bỏ qua</a>
+        </div>
+
+        {{#if reports.length}}
+        <div class="dashboard-card">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Người tố cáo</th>
+                        <th>Lý do</th>
+                        <th>Ghi chú</th>
+                        <th>Thời gian</th>
+                        {{#eq status "pending"}}<th>Hành động</th>{{/eq}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each reports}}
+                    <tr>
+                        <td data-label="Sản phẩm">
+                            <a href="/products/{{this.product.slug}}" target="_blank" style="display:flex;align-items:center;gap:8px;">
+                                <img src="{{#if this.product.img}}{{this.product.img}}{{else}}/img/pattern.png{{/if}}"
+                                     style="width:40px;height:40px;object-fit:cover;border-radius:4px;"
+                                     onerror="this.onerror=null;this.src='/img/pattern.png';">
+                                <strong>{{this.product.name}}</strong>
+                            </a>
+                        </td>
+                        <td data-label="Người tố cáo">{{this.reporter.name}}<br><span class="text-tiny">{{this.reporter.email}}</span></td>
+                        <td data-label="Lý do">{{this.reasonLabel}}</td>
+                        <td data-label="Ghi chú">{{#if this.note}}{{this.note}}{{else}}—{{/if}}</td>
+                        <td data-label="Thời gian">{{dateFormat this.createdAt}}</td>
+                        {{#eq ../status "pending"}}
+                        <td data-label="Hành động">
+                            <form method="POST" action="/admin/reports/{{this._id}}/takedown" style="display:inline;"
+                                  onsubmit="return confirm('Gỡ bài viết này khỏi sàn? Hành động không thể hoàn tác.')">
+                                <button type="submit" class="action-btn delete">Gỡ bài</button>
+                            </form>
+                            <form method="POST" action="/admin/reports/{{this._id}}/dismiss" style="display:inline;">
+                                <button type="submit" class="action-btn view">Bỏ qua</button>
+                            </form>
+                        </td>
+                        {{/eq}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="dashboard-empty">Không có tố cáo nào ở trạng thái này.</div>
+        {{/if}}
+    </div>
+</div>

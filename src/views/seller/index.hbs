@@ -1,0 +1,45 @@
+<div class="seller-directory-page">
+    <div class="container">
+        <h2 class="h2 mb-4">Tất cả cửa hàng trên ShopVN</h2>
+
+        {{#if sellers.length}}
+        <div class="seller-directory-grid">
+            {{#each sellers}}
+            <a href="/seller/{{this._id}}" class="seller-directory-card">
+                <img src="{{#if this.avatar}}{{this.avatar}}{{else}}{{avatarPlaceholder}}{{/if}}"
+                     alt="{{this.name}}" 
+                     class="seller-directory-avatar"
+                     onerror="avatarFallback(this)">
+                
+                <p class="seller-directory-name">{{this.name}}</p>
+                
+                <div class="seller-directory-stats">
+                    <span>{{this.productCount}} sản phẩm</span>
+                    <span class="separator"></span>
+                    <span>{{this.followerCount}} theo dõi</span>
+                </div>
+                
+                {{#if this.ratingAvg}}
+                <div class="seller-directory-rating">
+                    <ion-icon name="star"></ion-icon> {{this.ratingAvg}}
+                </div>
+                {{/if}}
+            </a>
+            {{/each}}
+        </div>
+
+        {{#if totalPages}}
+        <div class="pagination-bar">
+            <a class="page-btn {{#unless hasPrev}}disabled{{/unless}}" href="/seller?page={{prevPage}}">‹</a>
+            {{#each pages}}
+            <a class="page-btn {{#eq this ../currentPage}}active{{/eq}}" href="/seller?page={{this}}">{{this}}</a>
+            {{/each}}
+            <a class="page-btn {{#unless hasNext}}disabled{{/unless}}" href="/seller?page={{nextPage}}">›</a>
+        </div>
+        {{/if}}
+
+        {{else}}
+        <div class="alert alert-warning mt-3">Sàn chưa có cửa hàng nào đăng sản phẩm.</div>
+        {{/if}}
+    </div>
+</div>

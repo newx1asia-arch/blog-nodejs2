@@ -1,0 +1,31 @@
+{
+  "name": "blog-project2",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev:server": "nodemon src/index.js",
+    "watch": "sass --watch src/scss/app.scss src/public/css/app.css",
+    "dev": "concurrently \"npm run dev:server\" \"npm run watch\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-handlebars": "^8.0.1",
+    "express-session": "^1.19.0",
+    "google-auth-library": "^9.14.2",
+    "method-override": "^3.0.0",
+    "mongodb": "^7.5.0",
+    "mongoose": "^9.8.1",
+    "multer": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "sass": "^1.99.0"
+  }
+}

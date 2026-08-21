@@ -1,0 +1,53 @@
+<div class="account-page">
+    <div class="container">
+        <div class="account-grid">
+            {{> account-sidebar active="profile"}}
+
+            <div class="account-content">
+                <h3 class="h3 mb-3">Thông tin tài khoản</h3>
+
+                {{#if success}}<div class="field-success">{{success}}</div>{{/if}}
+                {{#if error}}<div class="field-error">{{error}}</div>{{/if}}
+
+                <div class="account-avatar-row">
+                    <img src="{{#if user.avatar}}{{user.avatar}}{{else}}/img/pattern.png{{/if}}"
+                         class="account-avatar-lg" alt="{{user.name}}"
+                         onerror="this.onerror=null;this.src='/img/pattern.png';">
+                    <form method="POST" action="/me/avatar" enctype="multipart/form-data" id="avatarForm">
+                        <label class="btn btn-secondary" for="avatarInput" style="cursor:pointer;">Đổi ảnh đại diện</label>
+                        <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display:none;">
+                    </form>
+                </div>
+
+                <form method="POST" action="/me/profile" class="account-form">
+                    <div class="field-group">
+                        <label class="field-label">Họ tên</label>
+                        <input type="text" class="field-input" name="name" value="{{user.name}}" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Email</label>
+                        <input type="email" class="field-input" value="{{user.email}}" disabled>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Số điện thoại</label>
+                        <input type="tel" class="field-input" name="phone" value="{{user.phone}}">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Địa chỉ</label>
+                        <textarea class="field-textarea" name="address" rows="3">{{user.address}}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', () => {
+            if (avatarInput.files.length) document.getElementById('avatarForm').submit();
+        });
+    }
+</script>

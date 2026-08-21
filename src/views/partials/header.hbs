@@ -1,0 +1,128 @@
+<header>
+    <div class="container">
+        <div class="header-top">
+            <a href="/" class="logo">
+                {{> logo}}
+            </a>
+
+            <div class="header-icons">
+                <a href="/seller" class="nav-link cart-link" title="Cửa hàng">
+                    <ion-icon name="storefront-outline"></ion-icon>
+                </a>
+
+                {{#if currentUser}}
+                <a href="/wishlist" class="nav-link cart-link" title="Yêu thích">
+                    <ion-icon name="heart-outline"></ion-icon>
+                    {{#if wishlistIds.length}}<span class="cart-badge">{{wishlistIds.length}}</span>{{/if}}
+                </a>
+                {{/if}}
+
+                <a href="/cart" class="nav-link cart-link">
+                    <ion-icon name="cart-outline"></ion-icon>
+                    {{#if cartCount}}<span class="cart-badge">{{cartCount}}</span>{{/if}}
+                </a>
+
+                <div class="dropdown account-dropdown-desktop">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{#if currentUser}}
+                            <img src="{{#if currentUser.avatar}}{{currentUser.avatar}}{{else}}{{avatarPlaceholder}}{{/if}}"
+                                 class="header-avatar" 
+                                 alt="{{currentUser.name}}"
+                                 onerror="avatarFallback(this)">
+                            {{currentUser.name}}
+                        {{else}}
+                            Tài khoản
+                        {{/if}}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        {{#if currentUser}}
+                            <a class="dropdown-item" href="/me/profile"><ion-icon name="person-outline"></ion-icon> Thông tin tài khoản</a>
+                            <a class="dropdown-item" href="/me/password"><ion-icon name="lock-closed-outline"></ion-icon> Đổi mật khẩu</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/products/create"><ion-icon name="add-circle-outline"></ion-icon> Đăng sản phẩm</a>
+                            <a class="dropdown-item" href="/me/products"><ion-icon name="pricetags-outline"></ion-icon> Sản phẩm của tôi</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/me/orders"><ion-icon name="receipt-outline"></ion-icon> Đơn hàng của tôi</a>
+                            <a class="dropdown-item" href="/wishlist"><ion-icon name="heart-outline"></ion-icon> Yêu thích</a>
+                            {{#eq currentUser.role "admin"}}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/reports"><ion-icon name="shield-checkmark-outline"></ion-icon> Quản trị tố cáo</a>
+                            {{/eq}}
+                            <div class="dropdown-divider"></div>
+                            <form method="POST" action="/auth/logout">
+                                <button type="submit" class="dropdown-item"><ion-icon name="log-out-outline"></ion-icon> Đăng xuất</button>
+                            </form>
+                        {{else}}
+                            <a class="dropdown-item" href="/auth/login">Đăng nhập</a>
+                            <a class="dropdown-item" href="/auth/register">Đăng ký</a>
+                        {{/if}}
+                    </div>
+                </div>
+
+                <button class="theme-btn theme-btn-desktop light">
+                    <ion-icon name="moon" class="moon"></ion-icon>
+                    <ion-icon name="sunny" class="sun"></ion-icon>
+                </button>
+
+                <button class="theme-btn theme-btn-mobile light">
+                    <ion-icon name="moon" class="moon"></ion-icon>
+                    <ion-icon name="sunny" class="sun"></ion-icon>
+                </button>
+
+                <button class="nav-menu-btn">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+
+        <form action="/search" method="GET" class="search-bar">
+            <input type="text" name="q" placeholder="Tìm kiếm sản phẩm...">
+            <button type="submit"><ion-icon name="search-outline"></ion-icon></button>
+        </form>
+
+        <nav class="category-bar">
+            <ul>
+                <li><a href="/">Trang chủ</a></li>
+                {{#each categories}}
+                <li><a href="/search?category={{this.key}}">{{this.name}}</a></li>
+                {{/each}}
+                <li><a href="/seller">Cửa hàng</a></li>
+                <li><a href="/about">Giới thiệu</a></li>
+                <li><a href="/contact">Liên hệ</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="mobile-nav">
+        <button class="nav-close-btn"><ion-icon name="close-outline"></ion-icon></button>
+        <div class="wrapper">
+            <p class="h3 nav-title">Menu</p>
+            <ul>
+                <li class="nav-item"><a href="/" class="nav-link">Trang chủ</a></li>
+                <li class="nav-item"><a href="/seller" class="nav-link">Cửa hàng</a></li>
+                <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
+                <li class="nav-item"><a href="/contact" class="nav-link">Liên hệ</a></li>
+                <li class="nav-item"><a href="/search" class="nav-link">Tìm kiếm</a></li>
+                {{#if currentUser}}
+                <li class="nav-item"><a href="/me/profile" class="nav-link">Thông tin tài khoản</a></li>
+                <li class="nav-item"><a href="/products/create" class="nav-link">Đăng sản phẩm</a></li>
+                <li class="nav-item"><a href="/me/products" class="nav-link">Sản phẩm của tôi</a></li>
+                <li class="nav-item"><a href="/me/orders" class="nav-link">Đơn hàng của tôi</a></li>
+                <li class="nav-item"><a href="/wishlist" class="nav-link">Yêu thích</a></li>
+                {{#eq currentUser.role "admin"}}
+                <li class="nav-item"><a href="/admin/reports" class="nav-link">Quản trị tố cáo</a></li>
+                {{/eq}}
+                {{else}}
+                <li class="nav-item"><a href="/auth/login" class="nav-link">Đăng nhập</a></li>
+                <li class="nav-item"><a href="/auth/register" class="nav-link">Đăng ký</a></li>
+                {{/if}}
+                <li class="nav-item"><a href="/cart" class="nav-link">Giỏ hàng</a></li>
+            </ul>
+            {{#if currentUser}}
+            <form method="POST" action="/auth/logout">
+                <button type="submit" class="btn btn-secondary w-100 mt-3">Đăng xuất</button>
+            </form>
+            {{/if}}
+        </div>
+    </div>
+</header>

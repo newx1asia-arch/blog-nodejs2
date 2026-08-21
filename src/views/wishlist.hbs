@@ -1,0 +1,24 @@
+<div class="account-page">
+    <div class="container">
+        <div class="account-grid">
+            {{> account-sidebar active="wishlist"}}
+
+            <div class="account-content">
+                <h3 class="h3 mb-3">Sản phẩm yêu thích</h3>
+
+                {{#if products.length}}
+                <div class="product-grid">
+                    {{#each products}}
+                        {{> product-card}}
+                    {{/each}}
+                </div>
+                {{else}}
+                <div class="cart-empty">
+                    <p>Bạn chưa thêm sản phẩm nào vào danh sách yêu thích.</p>
+                    <a href="/" class="btn btn-primary">Khám phá sản phẩm</a>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

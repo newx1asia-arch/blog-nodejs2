@@ -1,0 +1,60 @@
+<div class="account-page">
+    <div class="container">
+        <div class="account-grid">
+            {{> account-sidebar active="products"}}
+
+            <div class="account-content">
+                <div class="dashboard-header">
+                    <h3 class="h3 mb-0">Sản phẩm của tôi</h3>
+                    <a href="/products/create" class="btn btn-primary">+ Đăng sản phẩm mới</a>
+                </div>
+
+                {{#if products.length}}
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each products}}
+                        <tr>
+                            <td data-label="#">{{sum @index 1}}</td>
+                            <td data-label="Tên sản phẩm"><strong>{{this.name}}</strong></td>
+                            <td data-label="Giá">{{formatPrice this.price}}₫</td>
+                            <td data-label="Tồn kho">{{this.stock}}</td>
+                            <td data-label="Hành động">
+                                <a href="/products/{{this._id}}/edit" class="action-btn edit">Sửa</a>
+                                <form method="POST" action="/products/{{this._id}}?_method=DELETE" class="d-inline"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                                    <button type="submit" class="action-btn delete">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                {{#if totalPages}}
+                <div class="pagination-bar" style="padding: 20px 0;">
+                    <a class="page-btn {{#unless hasPrev}}disabled{{/unless}}" href="?page={{prevPage}}">‹</a>
+                    {{#each pages}}
+                    <a class="page-btn {{#eq this ../currentPage}}active{{/eq}}" href="?page={{this}}">{{this}}</a>
+                    {{/each}}
+                    <a class="page-btn {{#unless hasNext}}disabled{{/unless}}" href="?page={{nextPage}}">›</a>
+                </div>
+                {{/if}}
+
+                {{else}}
+                <div class="dashboard-empty">
+                    Bạn chưa đăng sản phẩm nào. <a href="/products/create">Đăng ngay!</a>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

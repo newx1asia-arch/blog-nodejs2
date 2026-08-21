@@ -1,0 +1,82 @@
+<div class="seller-page">
+    <div class="container">
+        <!-- Seller Header Section -->
+        <div class="seller-header" data-aos="fade-up">
+            <img src="{{#if seller.avatar}}{{seller.avatar}}{{else}}/img/pattern.png{{/if}}"
+                 alt="{{seller.name}}" 
+                 class="seller-avatar"
+                 onerror="this.onerror=null;this.src='/img/pattern.png';">
+
+            <div class="seller-info">
+                <h1 class="h2 mb-1">{{seller.name}}</h1>
+                <div class="seller-stats">
+                    <span><strong>{{formatCount totalProducts}}</strong> Sản phẩm</span>
+                    <span class="separator"></span>
+                    <span><strong>{{formatCount followerCount}}</strong> Người theo dõi</span>
+                    <span class="separator"></span>
+                    <span>Tham gia từ {{dateFormat seller.createdAt}}</span>
+                </div>
+            </div>
+
+            {{#if currentUser}}
+                {{#unless isOwnSeller}}
+                    <form method="POST" action="/seller/{{seller._id}}/follow">
+                        <button type="submit" class="btn {{#if isFollowing}}btn-secondary{{else}}btn-primary{{/if}} follow-btn">
+                            {{#if isFollowing}}
+                                <ion-icon name="checkmark-outline"></ion-icon> Đang theo dõi
+                            {{else}}
+                                + Theo dõi
+                            {{/if}}
+                        </button>
+                    </form>
+                {{/unless}}
+            {{/if}}
+        </div>
+
+        <!-- Vouchers Section -->
+        {{#if vouchers.length}}
+            <div class="seller-vouchers" data-aos="fade-up">
+                <p class="footer-title mb-2">Voucher của Shop</p>
+                <div class="seller-voucher-row">
+                    {{#each vouchers}}
+                        <div class="seller-voucher-card">
+                            <div class="seller-voucher-value">
+                                {{#eq this.type "percent"}}Giảm {{this.value}}%{{/eq}}
+                                {{#eq this.type "fixed"}}Giảm {{formatPrice this.value}}₫{{/eq}}
+                            </div>
+                            <div class="seller-voucher-code">Mã: {{this.code}}</div>
+                            {{#if this.minOrder}}
+                                <div class="seller-voucher-cond">Đơn tối thiểu {{formatPrice this.minOrder}}₫</div>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+            </div>
+        {{/if}}
+
+        <!-- Products Section -->
+        <div class="section-header-row" data-aos="fade-up">
+            <h2 class="h2 section-title mb-0">Tất cả sản phẩm ({{totalProducts}})</h2>
+        </div>
+
+        {{#if products.length}}
+            <div class="product-grid">
+                {{#each products}}
+                    {{> product-card}}
+                {{/each}}
+            </div>
+
+            {{#if totalPages}}
+                <div class="pagination-bar">
+                    <a class="page-btn {{#unless hasPrev}}disabled{{/unless}}" href="/seller/{{seller._id}}?page={{prevPage}}">‹</a>
+                    {{#each pages}}
+                        <a class="page-btn {{#eq this ../currentPage}}active{{/eq}}" href="/seller/{{../seller._id}}?page={{this}}">{{this}}</a>
+                    {{/each}}
+                    <a class="page-btn {{#unless hasNext}}disabled{{/unless}}" href="/seller/{{seller._id}}?page={{nextPage}}">›</a>
+                </div>
+            {{/if}}
+        {{else}}
+            <div class="alert alert-warning mt-3">Cửa hàng này chưa đăng sản phẩm nào.</div>
+        {{/if}}
+    </div>
+</div>

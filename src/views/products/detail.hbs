@@ -1,0 +1,187 @@
+<div class="main">
+    <div class="container">
+        <div class="product-detail-grid" data-aos="fade-up">
+
+            <div class="gallery-col">
+                <div class="gallery-main">
+                    <img src="{{images.[0]}}" alt="{{product.name}}" id="mainImage"
+                         onerror="this.onerror=null;this.src='/img/pattern.png';">
+                </div>
+                {{#if images.length}}
+                <div class="gallery-thumbs">
+                    {{#each images}}
+                    <img src="{{this}}" class="thumb {{#eq @index 0}}active{{/eq}}"
+                         alt="Ảnh {{sum @index 1}}" onclick="changeMainImage(this, '{{this}}')"
+                         onerror="this.onerror=null;this.src='/img/pattern.png';">
+                    {{/each}}
+                </div>
+                {{/if}}
+            </div>
+
+            <div class="product-info-col">
+                <h1 class="h2 mb-2">{{product.name}}</h1>
+
+                <div class="rating-row">
+                    <span>{{#if product.ratingAvg}}{{product.ratingAvg}}{{else}}0{{/if}}</span>
+                    <span class="stars">{{{renderStars product.ratingAvg}}}</span>
+                    <span>({{product.ratingCount}} đánh giá)</span>
+                    <span class="separator"></span>
+                    <span>Đã bán {{#if product.sold}}{{product.sold}}{{else}}0{{/if}}</span>
+                </div>
+
+                <div class="price-row mb-2">
+                    {{#if product.salePrice}}
+                        <span class="price-sale" style="font-size: var(--fs-1);">{{formatPrice product.salePrice}}₫</span>
+                        <span class="price-old">{{formatPrice product.price}}₫</span>
+                        <span class="sale-badge" style="position:static;">-{{discountPercent product.price product.salePrice}}%</span>
+                    {{else}}
+                        <span class="price-sale" style="font-size: var(--fs-1);">{{formatPrice product.price}}₫</span>
+                    {{/if}}
+                </div>
+
+                <p class="text-sm mb-3" style="color: var(--foreground-secondary);">
+                    Còn lại: {{product.stock}} sản phẩm
+                </p>
+
+                <div class="buy-box-actions">
+                    <form method="POST" action="/cart/add" class="buy-box">
+                        <input type="hidden" name="productId" value="{{product._id}}">
+                        <div class="qty-form">
+                            <input type="number" name="quantity" value="1" min="1" max="{{product.stock}}">
+                        </div>
+                        <button type="submit" class="btn btn-primary buy-box-btn" {{#unless product.stock}}disabled{{/unless}}>
+                            {{#if product.stock}}Thêm vào giỏ{{else}}Hết hàng{{/if}}
+                        </button>
+                    </form>
+
+                    {{#if currentUser}}
+                    <form method="POST" action="/wishlist/toggle/{{product._id}}">
+                        <button type="submit" class="btn btn-secondary wishlist-btn-detail {{#if isWishlisted}}active{{/if}}">
+                            <ion-icon name="{{#if isWishlisted}}heart{{else}}heart-outline{{/if}}"></ion-icon>
+                            {{#if isWishlisted}}Đã yêu thích{{else}}Yêu thích{{/if}}
+                        </button>
+                    </form>
+                    {{/if}}
+                </div>
+
+                {{#if product.owner}}
+                <a href="/seller/{{product.owner._id}}" class="seller-box">
+                    <img src="{{#if product.owner.avatar}}{{product.owner.avatar}}{{else}}{{avatarPlaceholder}}{{/if}}"
+                         alt="{{product.owner.name}}" class="seller-box-avatar"
+                         onerror="avatarFallback(this)">
+                    <div class="seller-box-info">
+                        <p class="seller-box-name">{{product.owner.name}}</p>
+                        <span class="seller-box-link">Xem cửa hàng</span>
+                    </div>
+                    <ion-icon name="chevron-forward-outline"></ion-icon>
+                </a>
+                {{/if}}
+
+                {{#if product.description}}
+                <div class="product-description">
+                    <p class="footer-title">Mô tả sản phẩm</p>
+                    <p style="color: var(--foreground-secondary); white-space: pre-line;">{{product.description}}</p>
+                </div>
+                {{/if}}
+
+                {{#if currentUser}}
+                    {{#unless isOwner}}
+                    <div class="report-block">
+                        {{#if alreadyReported}}
+                        <p class="report-done"><ion-icon name="checkmark-circle-outline"></ion-icon> Bạn đã tố cáo sản phẩm này, chúng tôi sẽ xem xét sớm.</p>
+                        {{else}}
+                        <button type="button" class="report-toggle-btn" onclick="document.getElementById('reportForm').classList.toggle('open')">
+                            <ion-icon name="flag-outline"></ion-icon> Tố cáo sản phẩm vi phạm
+                        </button>
+                        <form method="POST" action="/products/{{product._id}}/report" id="reportForm" class="report-form">
+                            <div class="field-group">
+                                <label class="field-label">Lý do tố cáo</label>
+                                <select class="field-select" name="reason">
+                                    <option value="fake">Hàng giả / hàng nhái</option>
+                                    <option value="prohibited">Sản phẩm cấm / vi phạm pháp luật</option>
+                                    <option value="spam">Spam / lừa đảo</option>
+                                    <option value="copyright">Vi phạm bản quyền</option>
+                                    <option value="other">Lý do khác</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Mô tả thêm (không bắt buộc)</label>
+                                <textarea class="field-textarea" name="note" rows="2" placeholder="Mô tả chi tiết vi phạm..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-secondary">Gửi tố cáo</button>
+                        </form>
+                        {{/if}}
+                    </div>
+                    {{/unless}}
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="reviews-section mt-5" id="reviews">
+            <h3 class="h3 mb-3">Đánh giá sản phẩm ({{product.ratingCount}})</h3>
+
+            {{#if currentUser}}
+                {{#unless hasReviewed}}
+                <form method="POST" action="/products/{{product._id}}/reviews" class="review-form mb-4">
+                    <div class="field-group">
+                        <label class="field-label">Đánh giá của bạn</label>
+                        <select class="field-select" name="rating" style="max-width: 160px;">
+                            <option value="5">5 sao - Tuyệt vời</option>
+                            <option value="4">4 sao - Tốt</option>
+                            <option value="3">3 sao - Bình thường</option>
+                            <option value="2">2 sao - Không hài lòng</option>
+                            <option value="1">1 sao - Rất tệ</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Nhận xét</label>
+                        <textarea class="field-textarea" name="comment" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                </form>
+                {{else}}
+                <div class="field-success">Bạn đã đánh giá sản phẩm này. Cảm ơn bạn!</div>
+                {{/unless}}
+            {{else}}
+                <p class="mb-4"><a href="/auth/login">Đăng nhập</a> để viết đánh giá cho sản phẩm này.</p>
+            {{/if}}
+
+            {{#if reviews.length}}
+                {{#each reviews}}
+                <div class="review-item">
+                    <div class="review-header">
+                       <img src="{{#if this.userAvatar}}{{this.userAvatar}}{{else}}{{avatarPlaceholder}}{{/if}}"
+                            class="review-avatar" alt="{{this.userName}}"
+                            onerror="avatarFallback(this)">
+                        <strong>{{this.userName}}</strong>
+                        <span class="stars">{{{renderStars this.rating}}}</span>
+                        <span class="text-tiny" style="color: var(--foreground-tertiary);">{{dateFormat this.createdAt}}</span>
+                    </div>
+                    {{#if this.comment}}<p style="color: var(--foreground-secondary);">{{this.comment}}</p>{{/if}}
+                </div>
+                {{/each}}
+            {{else}}
+                <p style="color: var(--foreground-secondary);">Chưa có đánh giá nào cho sản phẩm này.</p>
+            {{/if}}
+        </div>
+
+        {{#if relatedProducts.length}}
+        <div class="related-products">
+            <h3 class="h3 mb-3">Sản phẩm liên quan</h3>
+            <div class="product-grid">
+                {{#each relatedProducts}}
+                    {{> product-card}}
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+<script>
+    function changeMainImage(thumbEl, src) {
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.gallery-thumbs .thumb').forEach(t => t.classList.remove('active'));
+        thumbEl.classList.add('active');
+    }
+</script>

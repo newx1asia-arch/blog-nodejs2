@@ -1,0 +1,71 @@
+<div class="checkout-page">
+    <div class="container">
+        <h2 class="h2 mb-4">Thanh toán</h2>
+
+        {{#if error}}<div class="field-error">{{error}}</div>{{/if}}
+        {{#if voucherError}}<div class="field-error">{{voucherError}}</div>{{/if}}
+        {{#if voucherApplied}}<div class="field-success">Đã áp dụng mã "{{voucherApplied}}" — giảm {{formatPrice discount}}₫</div>{{/if}}
+
+        <div class="checkout-grid">
+            <div class="checkout-form-card">
+                <form method="POST" action="/checkout">
+                    <div class="field-group">
+                        <label class="field-label">Họ tên người nhận</label>
+                        <input type="text" class="field-input" name="shippingName" value="{{currentUser.name}}" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Số điện thoại</label>
+                        <input type="tel" class="field-input" name="shippingPhone" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Địa chỉ giao hàng</label>
+                        <textarea class="field-textarea" name="shippingAddress" rows="3" required></textarea>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Mã giảm giá</label>
+                        <div class="filter-price-row">
+                            <input type="text" class="field-input" name="voucherCode"
+                                   placeholder="Nhập mã (nếu có)" value="{{voucherApplied}}">
+                            <button type="submit" formaction="/checkout/apply-voucher" formnovalidate
+                                    class="btn btn-secondary" style="min-width:auto; white-space:nowrap;">
+                                Áp dụng
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Phương thức thanh toán</label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="COD" checked>
+                            Thanh toán khi nhận hàng (COD)
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Đặt hàng</button>
+                </form>
+            </div>
+
+            <div class="order-summary-card">
+                <p class="summary-title">Đơn hàng của bạn</p>
+                {{#each items}}
+                <div class="summary-line">
+                    <span>{{this.product.name}} x{{this.quantity}}</span>
+                    <span>{{formatPrice this.subtotal}}₫</span>
+                </div>
+                {{/each}}
+
+                {{#if discount}}
+                <div class="summary-line">
+                    <span>Giảm giá ({{voucherApplied}})</span>
+                    <span>-{{formatPrice discount}}₫</span>
+                </div>
+                {{/if}}
+
+                <div class="summary-total">
+                    <span>Tổng cộng</span>
+                    <span class="amount">{{formatPrice (defaultVal finalTotal total)}}₫</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="order-detail-page">
+    <div class="container">
+        {{#eq order.status "pending"}}
+        <div class="field-success">Đặt hàng thành công! Cảm ơn bạn đã mua sắm.</div>
+        {{/eq}}
+
+        <h2 class="h2 mb-4">Chi tiết đơn hàng #{{order._id}}</h2>
+
+        <div class="order-detail-grid">
+            <div class="order-items-card">
+                <table class="order-items-table">
+                    <thead>
+                        <tr><th>Sản phẩm</th><th>Giá</th><th>SL</th><th>Thành tiền</th></tr>
+                    </thead>
+                    <tbody>
+                        {{#each order.items}}
+                        <tr>
+                            <td>{{this.name}}</td>
+                            <td>{{formatPrice this.price}}₫</td>
+                            <td>{{this.quantity}}</td>
+                            <td>{{formatPrice this.subtotal}}₫</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                {{#if order.discount}}
+                <div class="summary-line" style="display:flex;justify-content:space-between;margin-top:10px;">
+                    <span>Tạm tính</span><span>{{formatPrice order.subtotal}}₫</span>
+                </div>
+                <div class="summary-line" style="display:flex;justify-content:space-between;">
+                    <span>Giảm giá ({{order.voucherCode}})</span><span>-{{formatPrice order.discount}}₫</span>
+                </div>
+                {{/if}}
+
+                <p class="order-items-total">Tổng cộng: <span class="amount">{{formatPrice order.total}}₫</span></p>
+            </div>
+
+            <div class="order-info-card">
+                <p class="summary-title">Thông tin giao hàng</p>
+                <p><strong>Người nhận:</strong> {{order.shippingName}}</p>
+                <p><strong>SĐT:</strong> {{order.shippingPhone}}</p>
+                <p><strong>Địa chỉ:</strong> {{order.shippingAddress}}</p>
+                <p><strong>Thanh toán:</strong> {{order.paymentMethod}}</p>
+                <p><strong>Trạng thái:</strong> <span class="status-pill {{statusClass order.status}}">{{order.status}}</span></p>
+            </div>
+        </div>
+
+        <a href="/me/orders" class="btn btn-secondary mt-4">Xem tất cả đơn hàng</a>
+    </div>
+</div>
