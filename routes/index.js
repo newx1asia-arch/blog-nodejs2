@@ -1,3 +1,4 @@
+// routes/index.js
 const siteRouter = require('./site');
 const productsRouter = require('./product');
 const cartRouter = require('./cart');
@@ -8,6 +9,7 @@ const wishlistRouter = require('./wishlist');
 const meRouter = require('./me');
 const sellerRouter = require('./seller');
 const adminRouter = require('./admin');
+const voucherRouter = require('./voucher');
 
 function route(app) {
     app.use('/products', productsRouter);
@@ -16,6 +18,7 @@ function route(app) {
     app.use('/checkout', checkoutRouter);
     app.use('/orders', orderRouter);
     app.use('/wishlist', wishlistRouter);
+    app.use('/me/vouchers', voucherRouter);
     app.use('/me', meRouter);
     app.use('/seller', sellerRouter);
     app.use('/admin', adminRouter);

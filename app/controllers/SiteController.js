@@ -1,14 +1,16 @@
+// app/controllers/SiteController.js
 const Product = require('../models/Product');
 const Contact = require('../models/Contact');
+const SiteSetting = require('../models/SiteSetting');
+const Voucher = require('../models/Voucher');
 const categories = require('../../config/db/categories');
 
 const PAGE_SIZE = 12;
 
 class SiteController {
-    // [GET] / (Trang chủ - nhiều section kiểu Shopee)
     async index(req, res, next) {
         try {
-            const [flashSaleProducts, suggestedProducts, categoryResults] = await Promise.all([
+            const [flashSaleProducts, suggestedProducts, categoryResults, settings, siteVouchers] = await Promise.all([
                 Product.find({ salePrice: { $exists: true, $ne: null, $gt: 0 } })
                     .sort({ createdAt: -1 })
                     .limit(10)
@@ -21,7 +23,13 @@ class SiteController {
                             .limit(4)
                             .lean()
                     )
-                )
+                ),
+                SiteSetting.getSettings(),
+                // Voucher toàn sàn (không thuộc seller nào) -> hiển thị nổi bật trên trang chủ
+                Voucher.find({ active: true, $or: [{ seller: null }, { seller: { $exists: false } }] })
+                    .sort({ createdAt: -1 })
+                    .limit(6)
+                    .lean()
             ]);
 
             const categorySections = categories.map((cat, i) => ({
@@ -30,19 +38,23 @@ class SiteController {
                 products: categoryResults[i]
             }));
 
-            res.render('home', { flashSaleProducts, suggestedProducts, categorySections });
+            res.render('home', {
+                flashSaleProducts,
+                suggestedProducts,
+                categorySections,
+                introVideo: settings.introVideo,
+                siteVouchers
+            });
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu trang chủ:", error);
-            res.render('home', { flashSaleProducts: [], suggestedProducts: [], categorySections: [] });
+            res.render('home', { flashSaleProducts: [], suggestedProducts: [], categorySections: [], siteVouchers: [] });
         }
     }
 
-    // [GET] /about
     about(req, res) {
         res.render('about');
     }
 
-    // [GET] /contact
     contact(req, res) {
         res.render('contact', {
             success: req.session.contactSuccess || null,
@@ -52,7 +64,6 @@ class SiteController {
         req.session.contactError = null;
     }
 
-    // [POST] /contact
     async submitContact(req, res, next) {
         try {
             const fullname = (req.body.fullname || '').trim();
@@ -72,7 +83,6 @@ class SiteController {
         }
     }
 
-    // [GET] /search?q=...&category=...&minPrice=...&maxPrice=...&sort=...&page=...
     async search(req, res, next) {
         try {
             const keyword = req.query.q ? req.query.q.trim() : '';

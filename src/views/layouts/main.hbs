@@ -81,6 +81,42 @@
                 localStorage.setItem('shopvn-theme', next);
             });
         });
+
+        // ----- Category bar: cuộn ngang bằng lăn chuột + nút mũi tên -----
+        (function () {
+            const bar = document.getElementById('categoryBar');
+            if (!bar) return;
+            bar.addEventListener('wheel', (e) => {
+                if (e.deltaY === 0) return;
+                e.preventDefault();
+                bar.scrollLeft += e.deltaY;
+            }, { passive: false });
+
+            const prevBtn = document.querySelector('.cat-scroll-prev');
+            const nextBtn = document.querySelector('.cat-scroll-next');
+            if (prevBtn) prevBtn.addEventListener('click', () => bar.scrollBy({ left: -220, behavior: 'smooth' }));
+            if (nextBtn) nextBtn.addEventListener('click', () => bar.scrollBy({ left: 220, behavior: 'smooth' }));
+
+            const params = new URLSearchParams(location.search);
+            const activeCat = params.get('category');
+            if (activeCat) {
+                bar.querySelectorAll('a').forEach(a => {
+                    if (a.getAttribute('href') === `/search?category=${activeCat}`) a.classList.add('active');
+                });
+            }
+        })();
+
+        // ----- Nút copy mã voucher (trang chủ + trang cửa hàng) -----
+        document.querySelectorAll('.voucher-copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.dataset.code;
+                navigator.clipboard.writeText(code).then(() => {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = 'Đã sao chép!';
+                    setTimeout(() => { btn.innerHTML = original; }, 1500);
+                });
+            });
+        });
     </script>
 </body>
 </html>

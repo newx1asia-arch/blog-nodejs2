@@ -873,12 +873,14 @@ footer {
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .product-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px hsla(0, 0%, 0%, 0.12);
+  border-color: var(--accent);
 }
 
 .product-card-image {
@@ -2685,6 +2687,319 @@ footer .payment-icons span {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+}
+/* Đổi nút "viên thuốc" thành nút bo góc gọn hơn */
+.btn {
+  border-radius: 8px;
+}
+
+.status-pill {
+  border-radius: 6px;
+}
+
+.admin-tab {
+  border-radius: 6px;
+}
+
+/* Video giới thiệu trang chủ */
+.intro-video-section {
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.intro-video {
+  width: 100%;
+  max-height: 480px;
+  display: block;
+  background: #000;
+}
+
+.brand-logo-img {
+  height: 32px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .footer-brand .brand-logo-img {
+    height: 40px;
+  }
+}
+/*-----------------------------------*\
+    #CATEGORY BAR — cuộn mượt + gợi ý còn nội dung
+\*-----------------------------------*/
+.category-bar-wrap {
+  position: relative;
+  border-top: 1px solid var(--action-primary);
+}
+
+.category-bar {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-bar ul {
+  display: flex;
+  gap: 22px;
+  padding: 10px 4px;
+  white-space: nowrap;
+  scroll-snap-type: x proximity;
+}
+
+.category-bar li {
+  scroll-snap-align: start;
+}
+
+.category-bar a {
+  position: relative;
+  padding: 4px 2px;
+}
+
+.category-bar a.active {
+  color: var(--accent);
+}
+
+.category-bar a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.category-bar-wrap::before,
+.category-bar-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.category-bar-wrap::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--background-primary), transparent);
+}
+
+.category-bar-wrap::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--background-primary), transparent);
+}
+
+.cat-scroll-btn {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .cat-scroll-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--background-primary);
+    box-shadow: 0 1px 4px hsla(0, 0%, 0%, 0.15);
+    color: var(--foreground-secondary);
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .cat-scroll-btn:hover {
+    color: var(--accent);
+  }
+  .cat-scroll-prev {
+    left: -6px;
+  }
+  .cat-scroll-next {
+    right: -6px;
+  }
+}
+/*-----------------------------------*\
+    #VOUCHER — hiển thị dạng coupon + nút copy dùng chung
+\*-----------------------------------*/
+.home-voucher-section {
+  margin-bottom: 3rem;
+}
+
+.voucher-row,
+.seller-voucher-row,
+.flash-sale-row {
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.voucher-row > *,
+.seller-voucher-row > *,
+.flash-sale-row > * {
+  scroll-snap-align: start;
+}
+
+.voucher-row {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.voucher-coupon,
+.seller-voucher-card {
+  position: relative;
+  flex: 0 0 200px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: var(--white);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.voucher-coupon::before,
+.voucher-coupon::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--background-secondary);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.voucher-coupon::before {
+  left: -8px;
+}
+
+.voucher-coupon::after {
+  right: -8px;
+}
+
+.voucher-coupon-value {
+  font-weight: 800;
+  font-size: var(--fs-3);
+}
+
+.voucher-coupon-cond {
+  font-size: var(--fs-5);
+  opacity: 0.9;
+}
+
+.voucher-copy-btn {
+  margin-top: 6px;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: hsla(0, 0%, 100%, 0.2);
+  color: var(--white);
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: var(--fs-5);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: background 0.2s ease;
+}
+
+.voucher-copy-btn:hover {
+  background: hsla(0, 0%, 100%, 0.35);
+}
+
+.voucher-copy-btn ion-icon {
+  font-size: 14px;
+}
+
+.voucher-create-card {
+  background: var(--background-secondary);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 1.5rem;
+}
+
+.voucher-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 550px) {
+  .voucher-form .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/*-----------------------------------*\
+    #ADMIN — quản lý liên hệ
+\*-----------------------------------*/
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-card {
+  background: var(--background-primary);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.06);
+}
+
+.contact-card-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.contact-card-message {
+  color: var(--foreground-secondary);
+  font-size: var(--fs-4);
+  margin-bottom: 10px;
+  white-space: pre-line;
+}
+
+.contact-reply-box {
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: var(--fs-4);
+  color: var(--foreground-secondary);
+}
+
+.contact-reply-form textarea {
+  width: 100%;
+}
+
+/*-----------------------------------*\
+    #TỐI ƯU RESPONSIVE BỔ SUNG
+\*-----------------------------------*/
+@media (max-width: 480px) {
+  .voucher-coupon,
+  .seller-voucher-card {
+    flex-basis: 170px;
+  }
+  .home-voucher-section .section-header-row {
+    margin-bottom: 0.75rem;
+  }
+}
+/* Tăng vùng chạm cho nút copy voucher và nút cuộn danh mục trên mobile */
+@media (max-width: 1023px) {
+  .voucher-copy-btn {
+    min-height: 32px;
   }
 }
 

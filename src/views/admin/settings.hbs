@@ -1,0 +1,17 @@
+<div class="dashboard-page">
+    <div class="container">
+        <h2 class="h2 mb-4">Video giới thiệu trang chủ</h2>
+        {{#if settings.introVideo}}
+        <video controls style="max-width:500px; border-radius:10px; margin-bottom:1.5rem;">
+            <source src="{{settings.introVideo}}" type="video/mp4">
+        </video>
+        {{/if}}
+        <form method="POST" action="/admin/settings/video" enctype="multipart/form-data">
+            <div class="field-group">
+                <label class="field-label">Chọn video mới (mp4, webm, ogg, mov)</label>
+                <input type="file" class="field-input" name="introVideo" accept="video/*" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Tải lên</button>
+        </form>
+    </div>
+</div>

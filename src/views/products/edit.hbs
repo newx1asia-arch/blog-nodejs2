@@ -61,12 +61,103 @@
                     <div class="image-preview-row" id="imagePreview"></div>
                 </div>
 
+                {{#if product.video}}
+                <div class="field-group">
+                    <label class="field-label">Video hiện tại</label>
+                    <video controls preload="metadata" style="max-width:320px; border-radius:8px; display:block;">
+                        <source src="{{product.video}}" type="video/mp4">
+                    </video>
+                </div>
+                {{/if}}
+
+                <div class="field-group">
+                    <label class="field-label">Chọn video mới (không bắt buộc, tối đa 150MB)</label>
+                    <input type="file" class="field-input" name="video" accept="video/*">
+                    {{#if product.video}}<p class="text-tiny mt-1">Video hiện tại sẽ được giữ nguyên nếu bạn không chọn video mới.</p>{{/if}}
+                </div>
+
                 <button type="submit" class="btn btn-primary">Lưu lại</button>
             </form>
             {{else}}
             <div class="field-error">Không tìm thấy sản phẩm để cập nhật!</div>
             {{/if}}
         </div>
+
+        {{#if product}}
+        <!-- Voucher cửa hàng — cùng chỗ để seller tiện quản lý khi đang sửa sản phẩm -->
+        <div class="product-form-card mt-4" data-aos="fade-up">
+            <h3 class="h3 mb-2">Voucher cửa hàng</h3>
+            <p class="text-sm mb-3" style="color: var(--foreground-secondary);">
+                Tạo voucher giảm giá cho cửa hàng của bạn. Voucher sẽ hiển thị trên trang cửa hàng
+                để khách áp dụng khi thanh toán, dùng chung cho mọi sản phẩm bạn đang bán.
+            </p>
+
+            {{#if voucherSuccess}}<div class="field-success">{{voucherSuccess}}</div>{{/if}}
+            {{#if voucherError}}<div class="field-error">{{voucherError}}</div>{{/if}}
+
+            <form method="POST" action="/me/vouchers" class="voucher-form" id="voucherForm">
+                <input type="hidden" name="returnTo" value="/products/{{product._id}}/edit">
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Mã voucher</label>
+                        <input type="text" class="field-input" name="code" placeholder="VD: SHOP50K" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Loại giảm giá</label>
+                        <select class="field-select" name="type" id="voucherType">
+                            <option value="percent">Giảm theo %</option>
+                            <option value="fixed">Giảm số tiền cố định (đ)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label" id="valueLabel">Giá trị giảm (%)</label>
+                        <input type="text" inputmode="numeric" class="field-input voucher-value-input" name="value" required>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Giảm tối đa (đ, chỉ áp dụng cho %)</label>
+                        <input type="text" inputmode="numeric" class="field-input voucher-money-input" name="maxDiscount">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Đơn tối thiểu (đ)</label>
+                        <input type="text" inputmode="numeric" class="field-input voucher-money-input" name="minOrder" value="0">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Số lượt sử dụng (0 = không giới hạn)</label>
+                        <input type="number" class="field-input" name="usageLimit" min="0" value="0">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Ngày hết hạn (không bắt buộc)</label>
+                    <input type="date" class="field-input" name="expiresAt">
+                </div>
+                <button type="submit" class="btn btn-primary">+ Tạo voucher</button>
+            </form>
+
+            {{#if myVouchers.length}}
+            <div class="mt-4">
+                <p class="footer-title mb-2">Voucher hiện có của bạn ({{myVouchers.length}})</p>
+                <div class="voucher-row">
+                    {{#each myVouchers}}
+                    <div class="seller-voucher-card">
+                        <div class="seller-voucher-value">
+                            {{#eq this.type "percent"}}Giảm {{this.value}}%{{/eq}}
+                            {{#eq this.type "fixed"}}Giảm {{formatPrice this.value}}₫{{/eq}}
+                        </div>
+                        <div class="seller-voucher-code">Mã: {{this.code}}</div>
+                        {{#if this.minOrder}}<div class="seller-voucher-cond">Đơn tối thiểu {{formatPrice this.minOrder}}₫</div>{{/if}}
+                        <div class="seller-voucher-cond">{{#if this.active}}● Đang hoạt động{{else}}● Đã tắt{{/if}}</div>
+                    </div>
+                    {{/each}}
+                </div>
+                <p class="text-tiny mt-2"><a href="/me/vouchers">Quản lý đầy đủ voucher tại đây →</a></p>
+            </div>
+            {{/if}}
+        </div>
+        {{/if}}
     </div>
 </div>
 
@@ -98,6 +189,41 @@
 
     document.getElementById('productForm')?.addEventListener('submit', () => {
         document.querySelectorAll('.price-format-input').forEach(input => {
+            input.value = input.value.replace(/\D/g, '');
+        });
+    });
+
+    // ----- Voucher: định dạng số có dấu chấm -----
+    document.querySelectorAll('.voucher-money-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const raw = input.value.replace(/\D/g, '');
+            input.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+        });
+    });
+
+    const voucherType = document.getElementById('voucherType');
+    const valueInput = document.querySelector('.voucher-value-input');
+    const valueLabel = document.getElementById('valueLabel');
+
+    function applyValueFormatMode() {
+        const isFixed = voucherType.value === 'fixed';
+        valueLabel.textContent = isFixed ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)';
+        valueInput.placeholder = isFixed ? 'VD: 20.000' : 'VD: 10';
+        const raw = valueInput.value.replace(/\D/g, '');
+        valueInput.value = raw ? (isFixed ? Number(raw).toLocaleString('vi-VN') : raw) : '';
+    }
+
+    if (voucherType && valueInput) {
+        voucherType.addEventListener('change', applyValueFormatMode);
+        valueInput.addEventListener('input', () => {
+            const raw = valueInput.value.replace(/\D/g, '');
+            valueInput.value = raw ? (voucherType.value === 'fixed' ? Number(raw).toLocaleString('vi-VN') : raw) : '';
+        });
+        applyValueFormatMode();
+    }
+
+    document.getElementById('voucherForm')?.addEventListener('submit', () => {
+        document.querySelectorAll('.voucher-money-input, .voucher-value-input').forEach(input => {
             input.value = input.value.replace(/\D/g, '');
         });
     });

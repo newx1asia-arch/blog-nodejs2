@@ -16,6 +16,14 @@
                     {{/each}}
                 </div>
                 {{/if}}
+
+                {{#if product.video}}
+                <div class="gallery-video mt-2">
+                    <video controls preload="metadata" style="width:100%; border-radius:10px;">
+                        <source src="{{product.video}}" type="video/mp4">
+                    </video>
+                </div>
+                {{/if}}
             </div>
 
             <div class="product-info-col">

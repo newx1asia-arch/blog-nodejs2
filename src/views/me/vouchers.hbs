@@ -1,0 +1,142 @@
+{{! views/me/vouchers.hbs }}
+<div class="account-page">
+    <div class="container">
+        <div class="account-grid">
+            {{> account-sidebar active="vouchers"}}
+
+            <div class="account-content">
+                <div class="dashboard-header">
+                    <h3 class="h3 mb-0">Voucher cửa hàng của tôi</h3>
+                </div>
+
+                {{#if success}}<div class="field-success">{{success}}</div>{{/if}}
+                {{#if error}}<div class="field-error">{{error}}</div>{{/if}}
+
+                <div class="voucher-create-card">
+                    <p class="footer-title mb-2">Tạo voucher mới</p>
+                    <form method="POST" action="/me/vouchers" class="voucher-form" id="voucherForm">
+                        <div class="form-row">
+                            <div class="field-group">
+                                <label class="field-label">Mã voucher</label>
+                                <input type="text" class="field-input" name="code" placeholder="VD: SHOP50K" required>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Loại giảm giá</label>
+                                <select class="field-select" name="type" id="voucherType">
+                                    <option value="percent">Giảm theo %</option>
+                                    <option value="fixed">Giảm số tiền cố định (₫)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field-group">
+                                <label class="field-label" id="valueLabel">Giá trị giảm (%)</label>
+                                <input type="text" inputmode="numeric" class="field-input voucher-value-input" name="value" placeholder="VD: 10" required>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Giảm tối đa (₫, chỉ áp dụng cho %)</label>
+                                <input type="text" inputmode="numeric" class="field-input voucher-money-input" name="maxDiscount" placeholder="VD: 50.000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field-group">
+                                <label class="field-label">Đơn tối thiểu (₫)</label>
+                                <input type="text" inputmode="numeric" class="field-input voucher-money-input" name="minOrder" placeholder="VD: 100.000" value="0">
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Số lượt sử dụng (0 = không giới hạn)</label>
+                                <input type="number" class="field-input" name="usageLimit" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">Ngày hết hạn (không bắt buộc)</label>
+                            <input type="date" class="field-input" name="expiresAt">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tạo voucher</button>
+                    </form>
+                </div>
+
+                <p class="footer-title mt-4 mb-2">Voucher đã tạo</p>
+                {{#if vouchers.length}}
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Giảm</th>
+                            <th>Đơn tối thiểu</th>
+                            <th>Đã dùng</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each vouchers}}
+                        <tr>
+                            <td data-label="Mã"><strong>{{this.code}}</strong></td>
+                            <td data-label="Giảm">
+                                {{#eq this.type "percent"}}{{this.value}}%{{/eq}}
+                                {{#eq this.type "fixed"}}{{formatPrice this.value}}₫{{/eq}}
+                            </td>
+                            <td data-label="Đơn tối thiểu">{{formatPrice this.minOrder}}₫</td>
+                            <td data-label="Đã dùng">{{this.usedCount}}{{#if this.usageLimit}}/{{this.usageLimit}}{{/if}}</td>
+                            <td data-label="Trạng thái">
+                                <span class="status-pill {{#if this.active}}status-completed{{else}}status-cancelled{{/if}}">
+                                    {{#if this.active}}Đang hoạt động{{else}}Đã tắt{{/if}}
+                                </span>
+                            </td>
+                            <td data-label="Hành động">
+                                <form method="POST" action="/me/vouchers/{{this._id}}/toggle" style="display:inline;">
+                                    <button type="submit" class="action-btn edit">{{#if this.active}}Tắt{{else}}Bật{{/if}}</button>
+                                </form>
+                                <form method="POST" action="/me/vouchers/{{this._id}}?_method=DELETE" style="display:inline;"
+                                      onsubmit="return confirm('Xóa voucher này?')">
+                                    <button type="submit" class="action-btn delete">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <div class="dashboard-empty">Bạn chưa tạo voucher nào cho cửa hàng.</div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.voucher-money-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const raw = input.value.replace(/\D/g, '');
+            input.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+        });
+    });
+
+    const voucherType = document.getElementById('voucherType');
+    const valueInput = document.querySelector('.voucher-value-input');
+    const valueLabel = document.getElementById('valueLabel');
+
+    function applyValueFormatMode() {
+        const isFixed = voucherType.value === 'fixed';
+        valueLabel.textContent = isFixed ? 'Giá trị giảm (₫)' : 'Giá trị giảm (%)';
+        valueInput.placeholder = isFixed ? 'VD: 20.000' : 'VD: 10';
+        const raw = valueInput.value.replace(/\D/g, '');
+        valueInput.value = raw ? (isFixed ? Number(raw).toLocaleString('vi-VN') : raw) : '';
+    }
+
+    if (voucherType && valueInput) {
+        voucherType.addEventListener('change', applyValueFormatMode);
+        valueInput.addEventListener('input', () => {
+            const raw = valueInput.value.replace(/\D/g, '');
+            valueInput.value = raw ? (voucherType.value === 'fixed' ? Number(raw).toLocaleString('vi-VN') : raw) : '';
+        });
+        applyValueFormatMode();
+    }
+
+    document.getElementById('voucherForm')?.addEventListener('submit', () => {
+        document.querySelectorAll('.voucher-money-input, .voucher-value-input').forEach(input => {
+            input.value = input.value.replace(/\D/g, '');
+        });
+    });
+</script>

@@ -1,3 +1,4 @@
+{{! views/partials/account-sidebar.hbs }}
 <aside class="account-sidebar">
     <div class="account-user-card">
         <img src="{{#if currentUser.avatar}}{{currentUser.avatar}}{{else}}/img/pattern.png{{/if}}"
@@ -20,6 +21,9 @@
         </a>
         <a href="/me/products" class="account-nav-item {{#eq active "products"}}active{{/eq}}">
             <ion-icon name="pricetags-outline"></ion-icon> Sản phẩm của tôi
+        </a>
+        <a href="/me/vouchers" class="account-nav-item {{#eq active "vouchers"}}active{{/eq}}">
+            <ion-icon name="pricetag-outline"></ion-icon> Voucher của tôi
         </a>
         <a href="/wishlist" class="account-nav-item {{#eq active "wishlist"}}active{{/eq}}">
             <ion-icon name="heart-outline"></ion-icon> Yêu thích

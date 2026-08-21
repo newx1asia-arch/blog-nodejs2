@@ -36,6 +36,18 @@
     </div>
 </div>
 
+{{#if introVideo}}
+<div class="main" style="padding-bottom: 0;">
+    <div class="container main-container-full">
+        <div class="intro-video-section" data-aos="fade-up">
+            <video controls preload="metadata" class="intro-video">
+                <source src="{{introVideo}}" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</div>
+{{/if}}
+
 <div class="main">
     <div class="container main-container-full">
 
@@ -58,6 +70,28 @@
                 <ion-icon name="headset-outline"></ion-icon> Hỗ trợ
             </a>
         </div>
+
+        {{#if siteVouchers.length}}
+        <div class="home-voucher-section" data-aos="fade-up">
+            <div class="section-header-row">
+                <h2 class="h2 section-title mb-0">Voucher toàn sàn</h2>
+            </div>
+            <div class="voucher-row">
+                {{#each siteVouchers}}
+                <div class="voucher-coupon">
+                    <div class="voucher-coupon-value">
+                        {{#eq this.type "percent"}}Giảm {{this.value}}%{{/eq}}
+                        {{#eq this.type "fixed"}}Giảm {{formatPrice this.value}}₫{{/eq}}
+                    </div>
+                    {{#if this.minOrder}}<div class="voucher-coupon-cond">Đơn tối thiểu {{formatPrice this.minOrder}}₫</div>{{/if}}
+                    <button type="button" class="voucher-copy-btn" data-code="{{this.code}}">
+                        {{this.code}} <ion-icon name="copy-outline"></ion-icon>
+                    </button>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
 
         {{#if flashSaleProducts.length}}
         <div class="flash-sale-section" data-aos="fade-up">

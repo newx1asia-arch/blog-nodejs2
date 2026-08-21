@@ -2,7 +2,9 @@ const Product = require('../models/Product');
 const Review = require('../models/Review');
 const Wishlist = require('../models/Wishlist');
 const Report = require('../models/Report');
+const Voucher = require('../models/Voucher');
 const categories = require('../../config/db/categories');
+const { imagesToDataUris, videoToPublicPath } = require('../middlewares/productmedia');
 
 function generateSlug(name) {
     return name
@@ -15,10 +17,6 @@ function generateSlug(name) {
         .replace(/-+/g, '-');
 }
 
-function fileToDataUri(file) {
-    return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-}
-
 class ProductController {
     show(req, res, next) {
         Product.findOne({ slug: req.params.slug })
@@ -29,11 +27,6 @@ class ProductController {
                     return res.status(404).send('<h1>404 - Sản phẩm không tồn tại</h1><a href="/">Quay về trang chủ</a>');
                 }
 
-                // QUAN TRỌNG: chuẩn hoá owner thành object string thuần túy ngay tại controller.
-                // Trước đây template đọc thẳng {{product.owner._id}} — nếu populate không trả về
-                // object đầy đủ (hoặc owner vẫn là ObjectId thô), Handlebars không đọc được "_id"
-                // (bảo mật chặn truy cập property không phải "own property"), khiến link render ra
-                // "/seller/" rỗng -> lỗi "Cannot GET /seller/". Xử lý ở đây để luôn có ownerId hợp lệ.
                 let ownerInfo = null;
                 if (product.owner) {
                     if (typeof product.owner === 'object' && product.owner._id) {
@@ -43,15 +36,12 @@ class ProductController {
                             avatar: product.owner.avatar || null
                         };
                     } else {
-                        // populate thất bại, owner vẫn là ObjectId thô -> vẫn build được link bằng id gốc
                         ownerInfo = { _id: product.owner.toString(), name: 'Người bán', avatar: null };
                     }
                 }
                 product.owner = ownerInfo;
 
                 const [reviews, relatedProducts, wishlist, myReport] = await Promise.all([
-                    // populate('user', 'avatar') để lấy avatar HIỆN TẠI của người đánh giá,
-                    // thay vì chỉ dùng bản chụp userAvatar lưu tại thời điểm gửi đánh giá.
                     Review.find({ product: product._id })
                         .sort({ createdAt: -1 })
                         .populate('user', 'avatar')
@@ -64,8 +54,6 @@ class ProductController {
                     req.session.userId ? Report.findOne({ product: product._id, reporter: req.session.userId }).lean() : null
                 ]);
 
-                // Ưu tiên avatar hiện tại (từ populate) — nếu user đã bị xoá tài khoản
-                // (populate trả về null) thì rơi về bản chụp cũ userAvatar, cuối cùng mới null.
                 const normalizedReviews = reviews.map(r => ({
                     ...r,
                     userAvatar: (r.user && r.user.avatar) ? r.user.avatar : (r.userAvatar || null)
@@ -97,8 +85,24 @@ class ProductController {
             });
     }
 
-    create(req, res) {
-        res.render('products/create', { categories });
+    // [GET] /products/create — nạp thêm danh sách voucher của seller để hiển thị/tạo ngay tại đây
+    async create(req, res, next) {
+        try {
+            const myVouchers = await Voucher.find({ seller: req.session.userId })
+                .sort({ createdAt: -1 })
+                .lean();
+
+            res.render('products/create', {
+                categories,
+                myVouchers,
+                voucherSuccess: req.session.voucherSuccess || null,
+                voucherError: req.session.voucherFormError || null
+            });
+            req.session.voucherSuccess = null;
+            req.session.voucherFormError = null;
+        } catch (error) {
+            next(error);
+        }
     }
 
     async store(req, res, next) {
@@ -114,8 +118,8 @@ class ProductController {
             let slug = req.body.slug ? req.body.slug.trim() : generateSlug(name);
             slug = `${slug}-${Date.now().toString().slice(-5)}`;
 
-            // Ảnh lưu base64 thẳng vào MongoDB -> không mất khi server restart/redeploy
-            const images = (req.files || []).map(fileToDataUri);
+            const images = imagesToDataUris(req.files && req.files.images);
+            const video = videoToPublicPath(req.files && req.files.video);
 
             const dataToSave = {
                 ...req.body,
@@ -123,6 +127,7 @@ class ProductController {
                 slug,
                 images,
                 img: images[0] || '/img/pattern.png',
+                video,
                 owner: req.session.userId
             };
 
@@ -134,6 +139,7 @@ class ProductController {
         }
     }
 
+    // [GET] /products/:id/edit — cũng nạp voucher để tiện quản lý luôn khi sửa sản phẩm
     async edit(req, res, next) {
         try {
             const product = await Product.findById(req.params.id).lean();
@@ -143,7 +149,20 @@ class ProductController {
             if (product.owner && product.owner.toString() !== req.session.userId) {
                 return res.status(403).send('<h1>403 - Bạn không có quyền sửa sản phẩm này</h1><a href="/">Quay về trang chủ</a>');
             }
-            res.render('products/edit', { product, categories });
+
+            const myVouchers = await Voucher.find({ seller: req.session.userId })
+                .sort({ createdAt: -1 })
+                .lean();
+
+            res.render('products/edit', {
+                product,
+                categories,
+                myVouchers,
+                voucherSuccess: req.session.voucherSuccess || null,
+                voucherError: req.session.voucherFormError || null
+            });
+            req.session.voucherSuccess = null;
+            req.session.voucherFormError = null;
         } catch (error) {
             next(error);
         }
@@ -161,10 +180,17 @@ class ProductController {
 
             const dataToUpdate = { ...req.body, updatedAt: Date.now() };
 
-            // Chỉ ghi đè ảnh nếu người dùng thực sự chọn ảnh mới -> ảnh cũ không bao giờ bị mất khi sửa
-            if (req.files && req.files.length > 0) {
-                dataToUpdate.images = req.files.map(fileToDataUri);
-                dataToUpdate.img = dataToUpdate.images[0];
+            const newImages = imagesToDataUris(req.files && req.files.images);
+            if (newImages.length > 0) {
+                dataToUpdate.images = newImages;
+                dataToUpdate.img = newImages[0];
+            }
+
+            const newVideo = videoToPublicPath(req.files && req.files.video);
+            if (newVideo) {
+                dataToUpdate.video = newVideo;
+            } else {
+                delete dataToUpdate.video;
             }
 
             if (req.body.name && !req.body.slug) {

@@ -10,6 +10,7 @@ const Product = new Schema({
     stock: { type: Number, default: 0 },
     img: { type: String }, // có thể là đường dẫn cũ (/uploads/...) hoặc data URI base64 mới
     images: [{ type: String }],
+    video: { type: String, default: null }, // đường dẫn public tới video giới thiệu sản phẩm, VD: /uploads/videos/xxx.mp4
     sold: { type: Number, default: 0 },
     ratingAvg: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },

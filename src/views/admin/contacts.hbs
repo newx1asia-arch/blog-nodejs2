@@ -1,0 +1,46 @@
+{{! views/admin/contacts.hbs }}
+<div class="dashboard-page">
+    <div class="container">
+        <div class="dashboard-header">
+            <h2 class="h2 mb-0">Quản lý liên hệ khách hàng</h2>
+        </div>
+
+        {{#if success}}<div class="field-success">{{success}}</div>{{/if}}
+
+        <div class="admin-status-tabs">
+            <a href="/admin/contacts?status=new" class="admin-tab {{#eq status "new"}}active{{/eq}}">Chưa xử lý</a>
+            <a href="/admin/contacts?status=resolved" class="admin-tab {{#eq status "resolved"}}active{{/eq}}">Đã phản hồi</a>
+        </div>
+
+        {{#if contacts.length}}
+        <div class="contact-list">
+            {{#each contacts}}
+            <div class="contact-card">
+                <div class="contact-card-header">
+                    <div>
+                        <strong>{{this.fullname}}</strong>
+                        <span class="text-tiny" style="color: var(--foreground-tertiary);"> — {{this.email}}</span>
+                    </div>
+                    <span class="text-tiny">{{dateFormat this.createdAt}}</span>
+                </div>
+                <p class="contact-card-message">{{this.message}}</p>
+
+                {{#if this.adminReply}}
+                <div class="contact-reply-box">
+                    <p class="footer-title mb-1">Đã phản hồi ({{dateFormat this.repliedAt}})</p>
+                    <p>{{this.adminReply}}</p>
+                </div>
+                {{else}}
+                <form method="POST" action="/admin/contacts/{{this._id}}/reply" class="contact-reply-form">
+                    <textarea class="field-textarea" name="adminReply" rows="3" placeholder="Nhập nội dung phản hồi gửi tới khách hàng..." required></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Gửi phản hồi</button>
+                </form>
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+        {{else}}
+        <div class="dashboard-empty">Không có liên hệ nào ở trạng thái này.</div>
+        {{/if}}
+    </div>
+</div>

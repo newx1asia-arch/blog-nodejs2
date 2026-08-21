@@ -41,12 +41,14 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/products/create"><ion-icon name="add-circle-outline"></ion-icon> Đăng sản phẩm</a>
                             <a class="dropdown-item" href="/me/products"><ion-icon name="pricetags-outline"></ion-icon> Sản phẩm của tôi</a>
+                            <a class="dropdown-item" href="/me/vouchers"><ion-icon name="pricetag-outline"></ion-icon> Voucher của tôi</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/me/orders"><ion-icon name="receipt-outline"></ion-icon> Đơn hàng của tôi</a>
                             <a class="dropdown-item" href="/wishlist"><ion-icon name="heart-outline"></ion-icon> Yêu thích</a>
                             {{#eq currentUser.role "admin"}}
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/admin/reports"><ion-icon name="shield-checkmark-outline"></ion-icon> Quản trị tố cáo</a>
+                            <a class="dropdown-item" href="/admin/contacts"><ion-icon name="mail-outline"></ion-icon> Quản lý liên hệ</a>
                             {{/eq}}
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="/auth/logout">
@@ -80,17 +82,25 @@
             <button type="submit"><ion-icon name="search-outline"></ion-icon></button>
         </form>
 
-        <nav class="category-bar">
-            <ul>
-                <li><a href="/">Trang chủ</a></li>
-                {{#each categories}}
-                <li><a href="/search?category={{this.key}}">{{this.name}}</a></li>
-                {{/each}}
-                <li><a href="/seller">Cửa hàng</a></li>
-                <li><a href="/about">Giới thiệu</a></li>
-                <li><a href="/contact">Liên hệ</a></li>
-            </ul>
-        </nav>
+        <div class="category-bar-wrap">
+            <button class="cat-scroll-btn cat-scroll-prev" type="button" aria-label="Cuộn trái">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </button>
+            <nav class="category-bar" id="categoryBar">
+                <ul>
+                    <li><a href="/">Trang chủ</a></li>
+                    {{#each categories}}
+                    <li><a href="/search?category={{this.key}}">{{this.name}}</a></li>
+                    {{/each}}
+                    <li><a href="/seller">Cửa hàng</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                    <li><a href="/contact">Liên hệ</a></li>
+                </ul>
+            </nav>
+            <button class="cat-scroll-btn cat-scroll-next" type="button" aria-label="Cuộn phải">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+        </div>
     </div>
 
     <div class="mobile-nav">
@@ -107,10 +117,12 @@
                 <li class="nav-item"><a href="/me/profile" class="nav-link">Thông tin tài khoản</a></li>
                 <li class="nav-item"><a href="/products/create" class="nav-link">Đăng sản phẩm</a></li>
                 <li class="nav-item"><a href="/me/products" class="nav-link">Sản phẩm của tôi</a></li>
+                <li class="nav-item"><a href="/me/vouchers" class="nav-link">Voucher của tôi</a></li>
                 <li class="nav-item"><a href="/me/orders" class="nav-link">Đơn hàng của tôi</a></li>
                 <li class="nav-item"><a href="/wishlist" class="nav-link">Yêu thích</a></li>
                 {{#eq currentUser.role "admin"}}
                 <li class="nav-item"><a href="/admin/reports" class="nav-link">Quản trị tố cáo</a></li>
+                <li class="nav-item"><a href="/admin/contacts" class="nav-link">Quản lý liên hệ</a></li>
                 {{/eq}}
                 {{else}}
                 <li class="nav-item"><a href="/auth/login" class="nav-link">Đăng nhập</a></li>
