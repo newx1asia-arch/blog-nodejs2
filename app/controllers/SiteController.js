@@ -13,13 +13,15 @@ class SiteController {
             const [flashSaleProducts, suggestedProducts, categoryResults, settings, siteVouchers] = await Promise.all([
                 Product.find({ salePrice: { $exists: true, $ne: null, $gt: 0 } })
                     .sort({ createdAt: -1 })
+                    .allowDiskUse(true)
                     .limit(10)
                     .lean(),
-                Product.find({}).sort({ createdAt: -1 }).limit(16).lean(),
+                Product.find({}).sort({ createdAt: -1 }).allowDiskUse(true).limit(16).lean(),
                 Promise.all(
                     categories.map(cat =>
                         Product.find({ category: cat.key })
                             .sort({ createdAt: -1 })
+                            .allowDiskUse(true)
                             .limit(4)
                             .lean()
                     )
@@ -113,6 +115,8 @@ class SiteController {
 
             const products = await Product.find(filter)
                 .sort(sortOption)
+                .allowDiskUse(true) // Product lưu ảnh base64 trong document nên có thể rất nặng;
+                                     // cho phép Mongo sort tạm trên đĩa để tránh lỗi "Sort exceeded memory limit"
                 .skip((currentPage - 1) * PAGE_SIZE)
                 .limit(PAGE_SIZE)
                 .lean();
