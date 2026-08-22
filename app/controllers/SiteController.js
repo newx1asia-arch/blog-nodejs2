@@ -85,8 +85,8 @@ class SiteController {
 
     async search(req, res, next) {
         try {
-            const keyword = req.query.q ? req.query.q.trim() : '';
-            const category = req.query.category ? req.query.category.trim() : '';
+            const keyword = req.query.q ? String(req.query.q).trim() : '';
+            const category = req.query.category ? String(req.query.category).trim() : '';
             const minPrice = req.query.minPrice ? Number(req.query.minPrice) : null;
             const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : null;
             const sort = req.query.sort || 'newest';
@@ -123,6 +123,7 @@ class SiteController {
 
             res.render('search', {
                 products,
+                categories,
                 keyword,
                 category,
                 minPrice: req.query.minPrice || '',
